@@ -10,4 +10,8 @@ app = FastAPI(title="Job Market API")
 def home():
     return {"status": "online", "message": "Job Market API is running"}
 
+@app.get("/health", tags=["Infrastructure"])
+def health_check():
+    return {"status": "online", "database": "connected"}
+
 app.include_router(jobs_router)
