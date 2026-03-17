@@ -2,6 +2,8 @@ import pandas as pd
 from app.database import SessionLocal, engine, Base
 from app.models.job import Job
 from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
 
 def extract_data():
     print("Starting data extraction...")
@@ -46,6 +48,17 @@ def load_data(df):
     finally:
         db.close()
 
+def test_scraper():
+    print("Testing connection...")
+    url = "https://news.ycombinator.com/jobs"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        print(f"Success! page: {soup.title.string}")
+    else:
+        print("Error accessing the site.")
+
 if __name__ == "__main__":
     print("Checking database structure...")
     Base.metadata.create_all(bind=engine)
@@ -53,3 +66,4 @@ if __name__ == "__main__":
     raw_df = extract_data()
     clean_df = transform_data(raw_df)
     load_data(clean_df)
+    test_scraper()
