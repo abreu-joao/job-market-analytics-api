@@ -35,7 +35,6 @@ def create_job(job: JobCreate, db: Session = Depends(get_db)):
 
 @router.get("/jobs/stats")
 def get_job_statistics(db: Session = Depends(get_db)):
-    """Retorna estatísticas gerais sobre as vagas armazenadas."""
     total = get_total_jobs(db)
     locations = get_jobs_by_location(db)
     

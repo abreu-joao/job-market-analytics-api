@@ -7,10 +7,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Get the project root directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Ensure the database is always created in the root directory
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'jobs_database.db')}")
 
 engine = create_engine(

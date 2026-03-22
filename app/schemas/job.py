@@ -7,7 +7,7 @@ class JobBase(BaseModel):
     company: str = Field(..., min_length=2)
     location: str
     technology: str
-    salary_min: Optional[float] = Field(None, ge=0) # ge=0 significa "Greater or Equal to 0"
+    salary_min: Optional[float] = Field(None, ge=0)
     salary_max: Optional[float] = Field(None, ge=0)
 
 class JobCreate(JobBase):
