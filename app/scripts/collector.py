@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-def extract_data():
+def extract_data() -> pd.DataFrame:
     print("Starting mass data extraction via The Muse API...")
     raw_jobs = []
     
@@ -41,7 +41,7 @@ def extract_data():
     print(f"Success! {len(df)} jobs extracted from the API.")
     return df
 
-def transform_data(df):
+def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     print("Starting data transformation: whitelist, technology, seniority, and title cleaning...")
     df['salary'] = pd.to_numeric(df['salary'], errors='coerce').fillna(0.0)
     df['title'] = df['title'].str.strip().str.title()
@@ -100,7 +100,7 @@ def transform_data(df):
     print(f"Transformation completed. {len(df)} jobs kept after filtering.")
     return df
 
-def load_data(df):
+def load_data(df: pd.DataFrame) -> None:
     print("Starting data load to database...")
     db = SessionLocal()
     try:
