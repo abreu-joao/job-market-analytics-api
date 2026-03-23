@@ -9,7 +9,7 @@ def extract_data() -> pd.DataFrame:
     print("Starting mass data extraction via The Muse API...")
     raw_jobs = []
     
-    for page in range(1, 25):
+    for page in range(1, 15):
         print(f"Downloading page {page}...")
         url = f"https://www.themuse.com/api/public/jobs?category=Software%20Engineering&page={page}"
         response = requests.get(url)
@@ -83,12 +83,14 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
 
     def extract_seniority(title):
         t = str(title).lower()
-        words = t.split()
-        if any(word in t for word in ['senior', 'sr', 'sr.', 'principal', 'lead', 'staff', 'manager']) or 'iii' in words:
+        t_clean = t.replace(',', ' ').replace('-', ' ').replace('/', ' ')
+        words = set(t_clean.split())
+        
+        if words.intersection({'senior', 'sr', 'principal', 'lead', 'staff', 'manager', 'iii'}):
             return 'Senior / Lead'
-        elif any(word in t for word in ['junior', 'jr', 'jr.', 'entry', 'intern', 'internship']) or 'i' in words:
+        elif words.intersection({'junior', 'jr', 'entry', 'intern', 'internship', 'i'}):
             return 'Junior / Entry'
-        elif 'mid' in t or 'ii' in words:
+        elif words.intersection({'mid', 'ii'}) or 'mid level' in t:
             return 'Mid-Level'
         else:
             return 'Not Specified'
