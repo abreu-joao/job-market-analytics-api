@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.services.job_service import (
     get_total_jobs, 
@@ -51,7 +51,7 @@ def create_job(job: JobCreate, db: Session = Depends(get_db)):
         technology=job.technology,
         seniority=job.seniority,
         salary=job.salary,
-        posted_at=datetime.utcnow() 
+        posted_at=datetime.now(timezone.utc) 
     )
     
     db.add(new_job)
