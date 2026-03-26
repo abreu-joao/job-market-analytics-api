@@ -4,6 +4,7 @@ from app.models.job import Job
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+import re
 
 def extract_data() -> pd.DataFrame:
     print("Starting mass data extraction via The Muse API...")
@@ -46,8 +47,8 @@ def extract_data() -> pd.DataFrame:
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     print("Starting data transformation: whitelist, technology, seniority, and title cleaning...")
-    df['title'] = df['title'].str.strip().str.title()
-    df['company'] = df['company'].str.strip()
+    df['title'] = df['title'].astype(str).str.strip().str.title()
+    df['company'] = df['company'].astype(str).str.strip()
     df['salary'] = pd.to_numeric(df['salary'], errors='coerce').fillna(0.0)
     df['posted_at'] = pd.to_datetime(df['posted_at'], errors='coerce').dt.tz_localize(None)
     
@@ -60,7 +61,7 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df['title'].str.lower().str.contains('|'.join(valid_words), na=False)]
 
     def clean_html(html_text):
-        if not html_text:
+        if not html_text or pd.isna(html_text):
             return ""
         return BeautifulSoup(str(html_text), "html.parser").get_text(separator=" ").lower()
 
@@ -102,20 +103,18 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     df['seniority'] = df['title'].apply(extract_seniority)
     
     def clean_title(title):
-        t = title.split('(')[0].strip()
+        if not title or pd.isna(title):
+            return "Not Specified"
+            
+        t = str(title)
         
-        t_normalized = t.replace(' - ', ',').replace(' / ', ',')
+        t = re.sub(r'\(.*?\)', '', t)
         
-        if ',' in t_normalized:
-            parts = [p.strip() for p in t_normalized.split(',')]
-            if len(parts[0]) <= 12 and len(parts) > 1:
-                t = parts[1]
-            else:
-                t = parts[0]
-        else:
-            t = t_normalized
-                
-        return t
+        t = t.split(' - ')[0].split(' – ')[0] 
+        
+        clean_t = t.strip(' ,-')
+        
+        return clean_t if clean_t else str(title).strip()
 
     df['title'] = df['title'].apply(clean_title)
     
