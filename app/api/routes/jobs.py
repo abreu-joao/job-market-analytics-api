@@ -12,13 +12,14 @@ from app.services.job_service import (
     get_remote_percentage,
     get_junior_friendly_companies
 )
+
 from app.database import get_db
 from app.models.job import Job
 from app.schemas.job import JobResponse, JobCreate
 
 router = APIRouter()
 
-@router.get("/jobs", response_model=List[JobResponse])
+@router.get("/jobs", response_model=List[JobResponse], tags=["Jobs Data"])
 def read_jobs(
     tech: Optional[str] = Query(None, description="Filter by technology (ex: Python)"),
     seniority: Optional[str] = Query(None, description="Filter by seniority (ex: Junior)"),
@@ -42,7 +43,7 @@ def read_jobs(
         
     return query.all()
 
-@router.get("/jobs/stats")
+@router.get("/jobs/stats", tags=["Market Statistics"])
 def get_job_statistics(db: Session = Depends(get_db)):
     return {
         "status": "success",
