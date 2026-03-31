@@ -7,7 +7,7 @@
 [![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=flat&logo=render&logoColor=white)](https://render.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An automated, end-to-end data pipeline and RESTful API built to extract, clean, and analyze tech job market trends in real-time. 
+An automated, end-to-end data pipeline and RESTful API built to extract, clean, and analyze current tech job market trends. 
 
 Live Deployment: **[Access the API and test endpoints here (Swagger UI)](https://job-market-api-betr.onrender.com/docs)**
 
@@ -18,7 +18,7 @@ Live Deployment: **[Access the API and test endpoints here (Swagger UI)](https:/
 This application is a fully automated data engineering pipeline designed to provide actionable intelligence on the current tech job market. 
 
 The architecture follows a strictly defined Data Flow:
-1. **Extraction:** An autonomous worker fetches raw job listings from external sources.
+1. **Extraction:** An autonomous worker consumes external APIs to fetch the latest job listings.
 2. **Transformation:** Data passes through a cleaning phase (whitelist filtering, seniority classification, and tech stack mapping) to ensure high data quality.
 3. **Loading:** Structured data is persisted into a PostgreSQL relational database.
 4. **Serving:** A high-performance FastAPI backend exposes the aggregated data through specialized endpoints.
@@ -41,7 +41,7 @@ The architecture follows a strictly defined Data Flow:
 To ensure a flawless developer experience, the local infrastructure is orchestrated using `docker-compose` with strict **condition-based startup sequences**. This guarantees that no service is exposed or executed before its dependencies are fully resolved.
 
 1. **`db` (PostgreSQL 15):** Bootstraps the relational database. It utilizes a custom Docker `healthcheck` running `pg_isready` to constantly ping the database until it is actively accepting TCP/IP connections, preventing premature downstream execution.
-2. **`etl_job` (Ephemeral Worker):** Configured with the `depends_on: service_healthy` condition. It waits for the database to be 100% ready, executes the web-scraping and ETL scripts, populates the database, and exits gracefully (`Exit 0`).
+2. **`etl_job` (Ephemeral Worker):** Configured with the `depends_on: service_healthy` condition. It waits for the database to be 100% ready, executes the API extraction and ETL scripts, populates the database, and exits gracefully (`Exit 0`).
 3. **`api` (FastAPI):** Configured with the `depends_on: service_completed_successfully` condition. It remains dormant until the `etl_job` container has finished its execution and terminated. This guarantees the API is never exposed to the user with an empty database.
 
 ---
